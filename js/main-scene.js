@@ -5,7 +5,6 @@ export default class MainScene extends Phaser.Scene {
     // Runs once, loads up assets like images and audio
     this.load.image("level 1-2 tileset", "../assets/tilesets/level 1 tileset.png");
     this.load.tilemapTiledJSON("map", "../assets/tilemaps/level 1.json");
-    this.load.atlas("emoji", "../assets/atlases/emoji.png", "../assets/atlases/emoji.json");
     this.load.image("block", "../assets/spritesheets/block.png");
     this.load.spritesheet(
       "player",
