@@ -106,23 +106,16 @@
                  "y":627
                 }, 
                 {
-                 "height":268,
-                 "id":10,
-                 "name":"level_end_bottom",
-                 "properties":
-                    {
-                     "level_end":true
-                    },
-                 "propertytypes":
-                    {
-                     "level_end":"bool"
-                    },
+                 "height":0,
+                 "id":15,
+                 "name":"level_end",
+                 "point":true,
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":32,
-                 "x":4769,
-                 "y":673
+                 "width":0,
+                 "x":4703,
+                 "y":914
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -130,7 +123,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":12,
+ "nextobjectid":16,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.1.6",

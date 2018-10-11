@@ -1,7 +1,16 @@
 import Player from "./player.js";
 
-export default class MainScene extends Phaser.Scene {
-  preload() {
+var Level1 = new Phaser.Class({
+        Extends: Phaser.Scene,
+        initialize:
+        function Level1 ()
+        {
+            Phaser.Scene.call(this, { key: 'Level1' });
+        },
+
+        preload: function ()
+        {
+
     // Runs once, loads up assets like images and audio
     this.load.image("level 1-2 tileset", "../assets/tilesets/level 1 tileset.png");
     this.load.tilemapTiledJSON("map", "../assets/tilemaps/level 1.json");
@@ -15,7 +24,8 @@ export default class MainScene extends Phaser.Scene {
         margin: 1,
         spacing: 2
       }
-    );
+      );
+
     this.load.spritesheet(
       "enemy",
       "../assets/spritesheets/sprites.png",
@@ -26,9 +36,10 @@ export default class MainScene extends Phaser.Scene {
         spacing: 2
       }
     );
-  }
+        },
 
-  create() {
+        create: function ()
+        {
     const map = this.make.tilemap({ key: "map" });
     // Runs once, after all assets in preload are loaded
     const tileset = map.addTilesetImage("level 1-2 tileset");
@@ -45,10 +56,6 @@ export default class MainScene extends Phaser.Scene {
     this.matter.world.convertTilemapLayer(groundLayer);
     this.matter.world.convertTilemapLayer(worldLayer);
 
-    const { Body, Bodies } = Phaser.Physics.Matter.Matter; // Native Matter modules
-
-    const level_end = Bodies.rectangle(map.widthInPixels, map.heightInPixels / 2, 32, map.heightInPixels, { isStatic: true, collides: true });
-
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.matter.world.setBounds(0, 0, map.widthInPixels + 16, map.heightInPixels);
 
@@ -57,6 +64,8 @@ export default class MainScene extends Phaser.Scene {
     // The spawn point is set using a point object inside of Tiled (within the "Spawn" object layer)
     const { x, y } = map.findObject("Spawn", obj => obj.name === "Spawn Point");
     this.player = new Player(this, x, y);
+
+    this.level_end = map.findObject("Objects", obj => obj.name === "level_end");
 
     // Smoothly follow the player
     this.cameras.main.startFollow(this.player.sprite, false, 0.5, 0.5);
@@ -75,26 +84,62 @@ export default class MainScene extends Phaser.Scene {
       callback: this.onPlayerCollide,
       context: this
     });
-  }
+        },
 
-  onPlayerCollide({ gameObjectB }) {
-    //if (!gameObjectB || !(gameObjectB instanceof Phaser.Tilemaps.Tile)) return;
-    //if (gameObjectB == level_end) {
-      //this.scene.start(Level2);
-      //game.scene.load.script(Level2, "level 2.js");
-    //}
+  onPlayerCollide: function({ gameObjectB })
+  {
+    if (this.player.sprite.x > this.level_end.x) {
+      this.scene.stop('Level1');
+      this.scene.start('Level2');
+    }
     const tile = gameObjectB;
-
-    // Check the tile property set in Tiled (you could also just check the index if you aren't using
-    // Tiled in your game)
-    /*if (tile.properties.level_end) {
-      this.scene.start(Level2);
-    }*/
   }
 
-  update(time, delta) {
-    // Runs once per frame for the duration of the scene
-    //this.controls.update(delta);
-  }
-}
+});
 
+var Level2 = new Phaser.Class({
+        Extends: Phaser.Scene,
+        initialize:
+        function Level2 ()
+        {
+            Phaser.Scene.call(this, { key: 'Level2' });
+        },
+
+        preload: function () {
+    // Runs once, loads up assets like images and audio
+    this.load.tilemapTiledJSON("level 2 map", "../assets/tilemaps/level 2.json");
+        },
+
+        create: function ()
+        {
+    const map = this.make.tilemap({ key: "level 2 map" });
+    // Runs once, after all assets in preload are loaded
+    const tileset = map.addTilesetImage("level 1-2 tileset");
+    
+    const worldLayer = map.createStaticLayer("background", tileset, 0, 0);
+    const groundLayer = map.createStaticLayer("foreground", tileset, 0, 0);
+
+    groundLayer.setCollisionByProperty({ collides: true });
+    worldLayer.setCollisionByProperty({ collides: true });
+    
+    // Get the layers registered with Matter. Any colliding tiles will be given a Matter body. We
+    // haven't mapped out custom collision shapes in Tiled so each colliding tile will get a default
+    // rectangle body (similar to AP).
+    this.matter.world.convertTilemapLayer(groundLayer);
+    this.matter.world.convertTilemapLayer(worldLayer);
+
+    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    this.matter.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
+    //this.matter.world.createDebugGraphic();
+
+    // The spawn point is set using a point object inside of Tiled (within the "Spawn" object layer)
+    const { x, y } = map.findObject("Spawn", obj => obj.name === "Spawn Point");
+    this.player = new Player(this, x, y);
+
+    // Smoothly follow the player
+    this.cameras.main.startFollow(this.player.sprite, false, 0.5, 0.5);
+        }
+});
+
+export { Level1, Level2 };

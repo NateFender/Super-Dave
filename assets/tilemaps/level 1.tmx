@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="150" height="30" tilewidth="32" tileheight="32" infinite="0" nextobjectid="12">
+<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="150" height="30" tilewidth="32" tileheight="32" infinite="0" nextobjectid="16">
  <tileset firstgid="1" name="level 1-2 tileset" tilewidth="32" tileheight="32" tilecount="8" columns="4">
   <image source="../tilesets/level 1 tileset.png" width="128" height="64"/>
   <tile id="0">
@@ -80,10 +80,8 @@
   <object id="9" name="level_end_top" x="4752" y="627">
    <point/>
   </object>
-  <object id="10" name="level_end_bottom" x="4769" y="673" width="32" height="268">
-   <properties>
-    <property name="level_end" type="bool" value="true"/>
-   </properties>
+  <object id="15" name="level_end" x="4703" y="914">
+   <point/>
   </object>
  </objectgroup>
 </map>

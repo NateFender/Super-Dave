@@ -7,15 +7,14 @@
  *  - Character by 0x72 under CC-0, https://0x72.itch.io/16x16-industrial-tileset
  */
 
-import MainScene from "./main-scene.js";
-
+import { Level1, Level2 } from "./main-scene.js";
 const config = {
   type: Phaser.AUTO,
   width: 800,
   height: 600,
   backgroundColor: "#000c1f",
   parent: "game-container",
-  scene: [ MainScene ],
+  scene: [ Level1, Level2 ],
   pixelArt: true,
   physics: { default: "matter" },
   plugins: {
