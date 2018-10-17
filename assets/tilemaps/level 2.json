@@ -60,14 +60,26 @@
         {
          "draworder":"topdown",
          "name":"Objects",
-         "objects":[],
+         "objects":[
+                {
+                 "height":0,
+                 "id":7,
+                 "name":"level_end",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":4688,
+                 "y":1549
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
          "x":0,
          "y":0
         }],
- "nextobjectid":7,
+ "nextobjectid":8,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.1.6",

@@ -101,13 +101,19 @@ export default class Player {
     // be able to press up against the wall and use friction to hang in midair. This formula leaves
     // 0.5px of overlap with the sensor so that the sensor will stay colliding on the next tick if
     // the player doesn't move.
+
+    // this.isTouching.left, this.isTouching.right, and the if statements governing pair.separation all
+    //   govern wall collisions and need to be enabled for the game to prevent "wall sticking." 
+    //   Touching a wall needs to enable this.isTouching.ground to allow players to jump off the wall. 
     if (bodyB.isSensor) return; // We only care about collisions with physical objects
     if (bodyA === this.sensors.left) {
-      this.isTouching.left = true;
-      if (pair.separation > 0.5) this.sprite.x += pair.separation - 0.5;
+      //this.isTouching.left = true;
+      this.isTouching.ground = true;
+      //if (pair.separation > 0.5) this.sprite.x += pair.separation - 0.5;
     } else if (bodyA === this.sensors.right) {
-      this.isTouching.right = true;
-      if (pair.separation > 0.5) this.sprite.x -= pair.separation - 0.5;
+      //this.isTouching.right = true;
+      this.isTouching.ground = true;
+      //if (pair.separation > 0.5) this.sprite.x -= pair.separation - 0.5;
     } else if (bodyA === this.sensors.bottom) {
       this.isTouching.ground = true;
     }
