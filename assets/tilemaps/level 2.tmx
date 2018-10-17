@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="150" height="50" tilewidth="32" tileheight="32" infinite="0" nextobjectid="7">
+<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="150" height="50" tilewidth="32" tileheight="32" infinite="0" nextobjectid="8">
  <tileset firstgid="1" name="level 1-2 tileset" tilewidth="32" tileheight="32" tilecount="8" columns="4">
   <image source="../tilesets/level 1 tileset.png" width="128" height="64"/>
   <tile id="0">
@@ -69,5 +69,9 @@
   </object>
  </objectgroup>
  <objectgroup name="Enemies"/>
- <objectgroup name="Objects"/>
+ <objectgroup name="Objects">
+  <object id="7" name="level_end" x="4688" y="1549">
+   <point/>
+  </object>
+ </objectgroup>
 </map>
