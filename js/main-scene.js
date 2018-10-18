@@ -11,17 +11,19 @@ var Level1 = new Phaser.Class({
   // The preload function runs once and loads up the assets for the game
   preload: function ()
   {
+    this.load.image("RobotTileset.v1", "../assets/tilesets/0x72_16x16RobotTileset.v1.png");
+    this.load.image("industrial.v2", "../assets/tilesets/industrial.v2.png");
     this.load.image("level 1-2 tileset", "../assets/tilesets/level 1 tileset.png");
-    this.load.tilemapTiledJSON("map", "../assets/tilemaps/level 1.json");
+    this.load.tilemapTiledJSON("map", "../assets/tilemaps/level 1 16bit.json");
     this.load.image("block", "../assets/spritesheets/block.png");
     this.load.spritesheet(
       "player",
-      "../assets/spritesheets/0x72-industrial-player-32px-extruded.png",
+      "../assets/spritesheets/industrial.v2-player-sprite.png",
       {
-        frameWidth: 32,
-        frameHeight: 32,
-        margin: 1,
-        spacing: 2
+        frameWidth: 16,
+        frameHeight: 16,
+        margin: 0,
+        spacing: 0
       }
       );
     this.load.spritesheet(
@@ -42,21 +44,23 @@ var Level1 = new Phaser.Class({
   {
     // Initialize a map from the tilemap and load a tileset for it
     this.map = this.make.tilemap({ key: "map" });
-    const tileset = this.map.addTilesetImage("level 1-2 tileset");
+    const robot_tileset = this.map.addTilesetImage("RobotTileset.v1");
+    const industrial_tileset = this.map.addTilesetImage("industrial.v2");
     
     // Load the layers. We're using static layers for now, but there are also dynamic layers
-    const worldLayer = this.map.createStaticLayer("background", tileset, 0, 0);
-    const groundLayer = this.map.createStaticLayer("foreground", tileset, 0, 0);
+    const background_layer = this.map.createStaticLayer("background 16bit", robot_tileset, 0, 0);
+    const background2_layer = this.map.createStaticLayer("background 2 16bit", robot_tileset, 0, 0);
+    const foreground_layer = this.map.createDynamicLayer("foreground 16bit", industrial_tileset, 0, 0);
 
     // Collision is turned on for all tiles that have the boolean property "collides" set to true
-    groundLayer.setCollisionByProperty({ collides: true });
-    worldLayer.setCollisionByProperty({ collides: true });
+    foreground_layer.setCollisionByProperty({ collides: true });
+    background2_layer.setCollisionByProperty({ collides: true });
     
     // Get the layers registered with Matter. Any colliding tiles will be given a Matter body. We
     // haven't mapped out custom collision shapes in Tiled so each colliding tile will get a default
     // rectangle body (similar to AP).
-    this.matter.world.convertTilemapLayer(groundLayer);
-    this.matter.world.convertTilemapLayer(worldLayer);
+    this.matter.world.convertTilemapLayer(foreground_layer);
+    this.matter.world.convertTilemapLayer(background2_layer);
 
     // This sets the bounds of the camera and the world
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
@@ -168,18 +172,18 @@ var Level2 = new Phaser.Class({
     const tileset = map.addTilesetImage("level 1-2 tileset");
     
     // Load the layers. We're using static layers for now, but there are also dynamic layers
-    const worldLayer = map.createStaticLayer("background", tileset, 0, 0);
-    const groundLayer = map.createStaticLayer("foreground", tileset, 0, 0);
+    const background_layer = map.createStaticLayer("background", tileset, 0, 0);
+    const foreground_layer = map.createStaticLayer("foreground", tileset, 0, 0);
 
     // Collision is turned on for all tiles that have the boolean property "collides" set to true
-    groundLayer.setCollisionByProperty({ collides: true });
-    worldLayer.setCollisionByProperty({ collides: true });
+    foreground_layer.setCollisionByProperty({ collides: true });
+    background_layer.setCollisionByProperty({ collides: true });
     
     // Get the layers registered with Matter. Any colliding tiles will be given a Matter body. We
     // haven't mapped out custom collision shapes in Tiled so each colliding tile will get a default
     // rectangle body (similar to AP).
-    this.matter.world.convertTilemapLayer(groundLayer);
-    this.matter.world.convertTilemapLayer(worldLayer);
+    this.matter.world.convertTilemapLayer(foreground_layer);
+    this.matter.world.convertTilemapLayer(background_layer);
 
     // This sets the bounds of the camera and the world
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -216,6 +220,30 @@ var Level2 = new Phaser.Class({
     }
 
   },
+
+  // This function tests collisions and will be used to implement level hazards.
+  onPlayerCollide: function({ gameObjectB })
+  {
+    if (!gameObjectB) return;
+
+    const tile = gameObjectB;
+    if ((gameObjectB instanceof Phaser.Tilemaps.Tile) && gameObjectB.properties.is_lethal) {
+      // Unsubscribe from collision events so that this logic is run only once
+      this.unsubscribePlayerCollide();
+
+      this.player.freeze();
+
+      const cam = this.cameras.main;
+      cam.fade(250, 0, 0, 0);
+      cam.once("camerafadeoutcomplete", () => this.scene.restart());
+    } else if (gameObjectB && gameObjectB.type == "Image") {
+      if (gameObjectB.texture.key == 'coin') {
+        gameObjectB.destroy();
+        this.coins++;
+        console.log(this.coins);
+      }
+    }
+  }
 
 
 });
