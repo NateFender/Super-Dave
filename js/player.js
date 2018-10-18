@@ -161,7 +161,7 @@ export default class Player {
     // --- Move the player horizontally ---
 
     // Adjust the movement so that the player is slower in the air
-    const moveForce = isOnGround ? 0.01 : 0.005;
+    const moveForce = isOnGround ? 0.004 : 0.002;
 
     if (isLeftKeyDown) {
       sprite.setFlipX(true);
@@ -182,8 +182,8 @@ export default class Player {
     // Limit horizontal speed, without this the player's velocity would just keep increasing to
     // absurd speeds. We don't want to touch the vertical velocity though, so that we don't
     // interfere with gravity.
-    if (velocity.x > 7) sprite.setVelocityX(7);
-    else if (velocity.x < -7) sprite.setVelocityX(-7);
+    if (velocity.x > 1) sprite.setVelocityX(1);
+    else if (velocity.x < -1) sprite.setVelocityX(-1);
 
     // --- Move the player vertically ---
 
