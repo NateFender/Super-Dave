@@ -66,6 +66,10 @@ export default class Player {
     // Track which sensors are touching something
     this.isTouching = { left: false, right: false, ground: false };
 
+    this.wall_jumps_enabled = false;
+    this.double_jumps_enabled = false;
+    this.air_dash_enabled = false;
+
     // Jumping is going to have a cooldown
     this.canJump = true;
     this.jumpCooldownTimer = null;
@@ -91,6 +95,10 @@ export default class Player {
     this.jumpInput = new MultiKey(scene, [UP, W]);
 
     this.scene.events.on("update", this.update, this);
+    this.destroyed = false;
+    this.scene.events.on("update", this.update, this);
+    this.scene.events.once("shutdown", this.destroy, this);
+    this.scene.events.once("destroy", this.destroy, this);
   }
   
   onSensorCollide({ bodyA, bodyB, pair }) {
@@ -107,13 +115,23 @@ export default class Player {
     //   Touching a wall needs to enable this.isTouching.ground to allow players to jump off the wall. 
     if (bodyB.isSensor) return; // We only care about collisions with physical objects
     if (bodyA === this.sensors.left) {
-      //this.isTouching.left = true;
-      this.isTouching.ground = true;
-      //if (pair.separation > 0.5) this.sprite.x += pair.separation - 0.5;
+      if (!this.wall_jumps_enabled) {
+        this.isTouching.left = true;
+      } else {
+        this.isTouching.ground = true;
+      }
+      if (!this.wall_jumps_enabled) {
+        if (pair.separation > 0.5) this.sprite.x += pair.separation - 0.5;
+      }
     } else if (bodyA === this.sensors.right) {
-      //this.isTouching.right = true;
-      this.isTouching.ground = true;
-      //if (pair.separation > 0.5) this.sprite.x -= pair.separation - 0.5;
+      if (!this.wall_jumps_enabled) {
+        this.isTouching.right = true;
+      } else {
+        this.isTouching.ground = true;
+      }
+      if (!this.wall_jumps_enabled) {
+        if (pair.separation > 0.5) this.sprite.x -= pair.separation - 0.5;
+      }
     } else if (bodyA === this.sensors.bottom) {
       this.isTouching.ground = true;
     }
@@ -191,5 +209,25 @@ export default class Player {
     }
   }
 
-  destroy() {}
+  destroy() {
+    this.destroyed = true;
+
+    // Event listeners
+    this.scene.events.off("update", this.update, this);
+    this.scene.events.off("shutdown", this.destroy, this);
+    this.scene.events.off("destroy", this.destroy, this);
+    if (this.scene.matter.world) {
+      this.scene.matter.world.off("beforeupdate", this.resetTouching, this);
+    }
+
+    // Matter collision plugin
+    const sensors = [this.sensors.bottom, this.sensors.left, this.sensors.right];
+    this.scene.matterCollision.removeOnCollideStart({ objectA: sensors });
+    this.scene.matterCollision.removeOnCollideActive({ objectA: sensors });
+
+    // Don't want any timers triggering post-mortem
+    if (this.jumpCooldownTimer) this.jumpCooldownTimer.destroy();
+
+    this.sprite.destroy();
+  }
 }
