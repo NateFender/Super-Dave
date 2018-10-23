@@ -21,6 +21,13 @@ export default class Player {
 
     // Create the physics-based sprite that we will move around and animate
     this.sprite = scene.matter.add.sprite(0, 0, "player", 0);
+    var drewThing = 1
+    var drewThing2 = 2
+    var drewThing3 = 2
+    var drewThing4 = 2
+    var airdashUsed = 0
+    var startTimeL = new Date()
+    var startTimeR = new Date()
 
     // The player's body is going to be a compound body that looks something like this:
     //
@@ -47,9 +54,9 @@ export default class Player {
     const { width: w, height: h } = this.sprite;
     const mainBody = Bodies.rectangle(0, 0, w * 0.6, h, { chamfer: { radius: 10 } });
     this.sensors = {
-      bottom: Bodies.rectangle(0, h * 0.5, w * 0.25, 2, { isSensor: true }),
-      left: Bodies.rectangle(-w * 0.35, 0, 2, h * 0.5, { isSensor: true }),
-      right: Bodies.rectangle(w * 0.35, 0, 2, h * 0.5, { isSensor: true })
+      bottom: Bodies.rectangle(0, h * 0.5, w * 0.6, 1, { isSensor: true }),
+      left: Bodies.rectangle(-w * 0.35, 0, 1, h * 0.5, { isSensor: true }),
+      right: Bodies.rectangle(w * 0.35, 0, 1, h * 0.5, { isSensor: true })
     };
     const compoundBody = Body.create({
       parts: [mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right],
@@ -121,7 +128,7 @@ export default class Player {
         this.isTouching.ground = true;
       }
       if (!this.wall_jumps_enabled) {
-        if (pair.separation > 0.5) this.sprite.x += pair.separation - 0.5;
+        if (pair.separation > 0.1) this.sprite.x += pair.separation - 0.1;
       }
     } else if (bodyA === this.sensors.right) {
       if (!this.wall_jumps_enabled) {
@@ -130,7 +137,7 @@ export default class Player {
         this.isTouching.ground = true;
       }
       if (!this.wall_jumps_enabled) {
-        if (pair.separation > 0.5) this.sprite.x -= pair.separation - 0.5;
+        if (pair.separation > 0.1) this.sprite.x -= pair.separation - 0.1;
       }
     } else if (bodyA === this.sensors.bottom) {
       this.isTouching.ground = true;
@@ -182,9 +189,14 @@ export default class Player {
     // Limit horizontal speed, without this the player's velocity would just keep increasing to
     // absurd speeds. We don't want to touch the vertical velocity though, so that we don't
     // interfere with gravity.
-    if (velocity.x > 1) sprite.setVelocityX(1);
-    else if (velocity.x < -1) sprite.setVelocityX(-1);
-
+    if(this.airdashUsed == 0){
+      if (velocity.x > 1) sprite.setVelocityX(1);
+      else if (velocity.x < -1) sprite.setVelocityX(-1);
+    }
+    else{
+      if (velocity.x > 3) sprite.setVelocityX(3);
+      else if (velocity.x < -3) sprite.setVelocityX(-3);
+    }
     // --- Move the player vertically ---
 
     if (isJumpKeyDown && this.canJump && isOnGround) {
@@ -197,17 +209,91 @@ export default class Player {
         delay: 250,
         callback: () => (this.canJump = true)
       });
+      this.drewThing2 = 1
+    }
+
+    if (isJumpKeyDown == false && this.drewThing2 == 1) {
+      this.drewThing2 = 0
+    }
+
+    if (isJumpKeyDown && this.drewThing2 == 0 && this.drewThing == 1 && isOnGround == false) {
+      this.drewThing = 0
+      this.drewThing2 = 2
+      sprite.setVelocityY(-11);
+
+      // Add a slight delay between jumps since the bottom sensor will still collide for a few
+      // frames after a jump is initiated
+      this.canJump = false;
+      this.jumpCooldownTimer = this.scene.time.addEvent({
+        delay: 250,
+        callback: () => (this.canJump = true)
+      });
+    }
+
+    if (isLeftKeyDown && isOnGround == false && this.drewThing3 == 0 && this.drewThing == 1) {
+      var endTime = new Date();
+      if(endTime - this.startTimeL < 100) {
+        this.drewThing2 = 2
+        sprite.setVelocityX(-24)
+        this.drewThing = 0
+        this.airdashUsed = 1
+      }
+      else {
+        this.startTimeL = new Date();
+        this.drewThing3 = 1
+      }
+    }
+
+    if (isLeftKeyDown && isOnGround == false && this.drewThing3 == 2 && this.drewThing == 1) {
+      this.drewThing3 = 1
+    }
+
+    if (isLeftKeyDown == false && isOnGround == false && this.drewThing3 == 1 && this.drewThing == 1) {
+      this.startTimeL = new Date();
+      this.drewThing3 = 0
+    }
+
+    if (isRightKeyDown && isOnGround == false && this.drewThing4 == 0 && this.drewThing == 1) {
+      var endTime = new Date();
+      if(endTime - this.startTimeR < 100) {
+        this.drewThing2 = 2
+        sprite.setVelocityX(24)
+        this.drewThing = 0
+        this.airdashUsed = 1
+      }
+      else {
+        this.startTimeR = new Date();
+        this.drewThing4 = 1
+      }
+    }
+
+    if (isRightKeyDown && isOnGround == false && this.drewThing4 == 2 && this.drewThing == 1) {
+      this.drewThing4 = 1
+    }
+
+    if (isRightKeyDown == false && isOnGround == false && this.drewThing4 == 1 && this.drewThing == 1) {
+      this.startTimeR = new Date();
+      this.drewThing4 = 0
     }
 
     // Update the animation/texture based on the state of the player's state
     if (isOnGround) {
       if (sprite.body.force.x !== 0) sprite.anims.play("player-run", true);
       else sprite.anims.play("player-idle", true);
+      this.drewThing = 1
+      if (this.drewThing2 == 0)
+      {
+        this.drewThing2 = 2
+      }
+      this.drewThing3 = 2
+      this.drewThing4 = 2
+      this.airdashUsed = 0
     } else {
       sprite.anims.stop();
       sprite.setTexture("player", 10);
     }
   }
+
 
   destroy() {
     this.destroyed = true;
