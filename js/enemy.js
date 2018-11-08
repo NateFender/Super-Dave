@@ -1,8 +1,11 @@
 import MultiKey from "./multi-key.js";
 
 export default class Enemy_1 {
-  constructor(scene, x, y) {
+  constructor(scene, x, y, min_y) {
     this.scene = scene;
+    this.direction = "right";
+    this.move_force = 0.0015;
+    this.min_y = min_y;
 
     // Create the animations we need from the player spritesheet
     const anims = scene.anims;
@@ -25,7 +28,7 @@ export default class Enemy_1 {
 
     // Create the physics-based sprite that we will move around and animate
     this.sprite = scene.matter.add.sprite(0, 0, "enemy 1", 0);
-    this.sprite.anims.play("enemy 1 idle", true);
+    this.sprite.anims.play("enemy 1 walk", true);
 
     const { Body, Bodies } = Phaser.Physics.Matter.Matter; // Native Matter modules
     const { width: w, height: h } = this.sprite;
@@ -73,6 +76,7 @@ export default class Enemy_1 {
   }
   
   onSensorCollide({ bodyA, bodyB, pair }) {
+    if (!bodyB) return;
     // Watch for the player colliding with walls/objects on either side and the ground below, so
     // that we can use that logic inside of update to move the player.
     // Note: we are using the "pair.separation" here. That number tells us how much bodyA and bodyB
@@ -85,13 +89,17 @@ export default class Enemy_1 {
     //   govern wall collisions and need to be enabled for the game to prevent "wall sticking." 
     //   Touching a wall needs to enable this.isTouching.ground to allow players to jump off the wall. 
     //if (bodyB.isSensor) return; // We only care about collisions with physical objects
-
-    if (bodyB.gameObject && bodyB.gameObject.texture && bodyB.gameObject.texture.key == 'enemy 1') {
-      if (bodyA === this.sensors.bottom) {
-        console.log("bottom");
-        bodyB.destroy();
-      } else if (bodyA === this.sensors.left || bodyA === this.sensors.right) {
-        console.log("side");
+    if (!(bodyB.parent && bodyB.parent.gameObject && bodyB.parent.gameObject.texture && (bodyB.parent.gameObject.texture.key == 'coin'))) {
+      if (bodyA === this.sensors.left) {
+        if (this.direction === "left") {
+          this.direction = "right";
+          this.sprite.setFlipX(false);
+        }
+      } else if (bodyA === this.sensors.right) {
+        if (this.direction === "right") {
+          this.direction = "left";
+          this.sprite.setFlipX(true);
+        }
       }
     }
   }
@@ -111,12 +119,20 @@ export default class Enemy_1 {
 
     const sprite = this.sprite;
     const velocity = sprite.body.velocity;
-
+    if (this.direction == "left") {
+      sprite.applyForce({ x: -this.move_force, y: 0 });
+    } else {
+      sprite.applyForce({ x: this.move_force, y: 0 });
+    }
     // Limit horizontal speed, without this the player's velocity would just keep increasing to
     // absurd speeds. We don't want to touch the vertical velocity though, so that we don't
     // interfere with gravity.
-    if (velocity.x > 3) sprite.setVelocityX(3);
-    else if (velocity.x < -3) sprite.setVelocityX(-3);
+    if (velocity.x > 0.25) sprite.setVelocityX(0.25);
+    else if (velocity.x < -0.25) sprite.setVelocityX(-0.25);
+    if (this.sprite.y > this.min_y) {
+      this.destroy();
+      this.sprite.setVisible(false);
+    }
   }
   destroy() {
     this.destroyed = true;

@@ -98,7 +98,7 @@
                 {
                  "height":0,
                  "id":4,
-                 "name":"block",
+                 "name":"enemy 1",
                  "point":true,
                  "rotation":0,
                  "type":"",
@@ -109,15 +109,15 @@
                 }, 
                 {
                  "height":0,
-                 "id":5,
-                 "name":"spike",
+                 "id":24,
+                 "name":"enemy 1",
                  "point":true,
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":2223,
-                 "y":138
+                 "x":2177.3088517402,
+                 "y":435.735818032338
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -231,7 +231,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":24,
+ "nextobjectid":26,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.1.6",
