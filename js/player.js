@@ -6,18 +6,22 @@ export default class Player {
 
     // Create the animations we need from the player spritesheet
     const anims = scene.anims;
-    anims.create({
-      key: "player-idle",
-      frames: anims.generateFrameNumbers("player", { start: 0, end: 3 }),
-      frameRate: 3,
-      repeat: -1
-    });
-    anims.create({
-      key: "player-run",
-      frames: anims.generateFrameNumbers("player", { start: 8, end: 15 }),
-      frameRate: 12,
-      repeat: -1
-    });
+    if(!anims.anims.entries["player-idle"]) {
+      anims.create({
+        key: "player-idle",
+        frames: anims.generateFrameNumbers("player", { start: 0, end: 3 }),
+        frameRate: 3,
+        repeat: -1
+      });
+    }
+    if(!anims.anims.entries["player-run"]) {
+      anims.create({
+        key: "player-run",
+        frames: anims.generateFrameNumbers("player", { start: 8, end: 15 }),
+        frameRate: 12,
+        repeat: -1
+      });
+    }
 
     // Create the physics-based sprite that we will move around and animate
     this.sprite = scene.matter.add.sprite(0, 0, "player", 0);
@@ -49,7 +53,7 @@ export default class Player {
     //
     // The main body is what collides with the world. The sensors are used to determine if the
     // player is blocked by a wall or standing on the ground.
-
+    this.dead = false;
     const { Body, Bodies } = Phaser.Physics.Matter.Matter; // Native Matter modules
     const { width: w, height: h } = this.sprite;
     const mainBody = Bodies.rectangle(0, 0, w * 0.6, h, { chamfer: { radius: 10 } });
@@ -120,7 +124,16 @@ export default class Player {
     // this.isTouching.left, this.isTouching.right, and the if statements governing pair.separation all
     //   govern wall collisions and need to be enabled for the game to prevent "wall sticking." 
     //   Touching a wall needs to enable this.isTouching.ground to allow players to jump off the wall. 
-    if (bodyB.isSensor) return; // We only care about collisions with physical objects
+    //if (bodyB.isSensor) return; // We only care about collisions with physical objects
+    //console.log(bodyB);
+    if (bodyB.parent && bodyB.parent.gameObject && bodyB.parent.gameObject.texture && bodyB.parent.gameObject.texture.key == 'enemy 1') {
+      if (bodyA === this.sensors.bottom) {
+        bodyB.parent.gameObject.setVisible(false);
+        bodyB.parent.destroy();
+      } else if (bodyA === this.sensors.left || bodyA === this.sensors.right) {
+        this.dead = true;
+      }
+    }
     if (bodyA === this.sensors.left) {
       if (!this.wall_jumps_enabled) {
         this.isTouching.left = true;
@@ -168,7 +181,7 @@ export default class Player {
     // --- Move the player horizontally ---
 
     // Adjust the movement so that the player is slower in the air
-    const moveForce = isOnGround ? 0.004 : 0.002;
+    const moveForce = isOnGround ? 0.0015 : 0.00075;
 
     if (isLeftKeyDown) {
       sprite.setFlipX(true);
