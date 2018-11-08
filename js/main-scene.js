@@ -91,7 +91,7 @@ var Level1 = new Phaser.Class({
     // Load up some objects. These will later be enemies or other level hazards.
     this.map.getObjectLayer("enemies").objects.forEach(createObject => {
       const { x, y } = createObject;
-      new Enemy_1(this, x, y);
+      new Enemy_1(this, x, y, this.map.heightInPixels-16);
       /*const { x, y, width, height } = crateObject;
 
       // Tiled origin for coordinate system is (0, 1), but we want (0.5, 0.5)
@@ -152,7 +152,7 @@ var Level1 = new Phaser.Class({
       this.player.freeze();
       const cam = this.cameras.main;
       //cam.once("camerafadeoutcomplete", () => this.scene.restart());
-      cam.fade(250,0,0,0);
+      //cam.fade(250,0,0,0);
       this.scene.restart();
     }
   },
@@ -173,6 +173,12 @@ var Level1 = new Phaser.Class({
       const cam = this.cameras.main;
       cam.fade(250, 0, 0, 0);
       cam.once("camerafadeoutcomplete", () => this.scene.restart());
+    } else if (gameObjectB && gameObjectB.type == "Image") {
+      if (gameObjectB.texture.key == 'coin') {
+        gameObjectB.destroy();
+        this.coins++;
+        console.log(this.coins);
+      }
     }
   }
 });
@@ -192,6 +198,7 @@ var Level2 = new Phaser.Class({
   // Create function runs once after preload has run
   create: function ()
   {
+    this.cameras.main.fadeIn(600);
     // Initialize a map from the tilemap and load a tileset for it
     this.map = this.make.tilemap({ key: "level 2 map" });
     const robot_tileset = this.map.addTilesetImage("RobotTileset.v1");
@@ -235,14 +242,15 @@ var Level2 = new Phaser.Class({
     this.cameras.main.startFollow(this.player.sprite, false, 0.5, 0.5);
 
     // Load up some objects. These will later be enemies or other level hazards.
-    this.map.getObjectLayer("enemies").objects.forEach(crateObject => {
-      const { x, y, width, height } = crateObject;
+    this.map.getObjectLayer("enemies").objects.forEach(createObject => {
+      const { x, y } = createObject;
+      new Enemy_1(this, x, y, this.map.heightInPixels-16);
 
       // Tiled origin for coordinate system is (0, 1), but we want (0.5, 0.5)
-      this.matter.add
+      /*this.matter.add
         .image(x + width / 2, y - height / 2, "enemy 1")
         .setBody({ shape: "rectangle", density: 0.001});
-    });
+    */});
 //TODO: give coins an actual sprite
     this.map.getObjectLayer("coins").objects.forEach(createObject => {
       const { x, y, width, height } = createObject;
@@ -264,11 +272,12 @@ var Level2 = new Phaser.Class({
   },
   // Update function runs for every frame.
   update: function() {
-    if (this.player.sprite.y > this.map.heightInPixels-16) {
+    if ((this.player.sprite.y > this.map.heightInPixels-16) || (this.player.dead)) {
       this.player.freeze();
       const cam = this.cameras.main;
-      cam.fade(250, 0, 0, 0);
-      cam.once("camerafadeoutcomplete", () => this.scene.restart());
+      //cam.fade(250, 0, 0, 0);
+      //cam.once("camerafadeoutcomplete", () => this.scene.restart());
+      this.scene.restart();
     }
     //Test if the player is beyond the level_end object
     if (this.player.sprite.x > this.level_end.x) {
@@ -318,6 +327,7 @@ var Level3 = new Phaser.Class({
   // Create function runs once after preload has run
   create: function ()
   {
+    this.cameras.main.fadeIn(600);
     // Initialize a map from the tilemap and load a tileset for it
     this.map = this.make.tilemap({ key: "level 3 map" });
     const robot_tileset = this.map.addTilesetImage("RobotTileset.v1");
@@ -361,14 +371,15 @@ var Level3 = new Phaser.Class({
     this.cameras.main.startFollow(this.player.sprite, false, 0.5, 0.5);
 
     // Load up some objects. These will later be enemies or other level hazards.
-    this.map.getObjectLayer("enemies").objects.forEach(crateObject => {
-      const { x, y, width, height } = crateObject;
+    this.map.getObjectLayer("enemies").objects.forEach(createObject => {
+      const { x, y } = createObject;
+      new Enemy_1(this, x, y, this.map.heightInPixels-16);
 
       // Tiled origin for coordinate system is (0, 1), but we want (0.5, 0.5)
-      this.matter.add
+      /*this.matter.add
         .image(x + width / 2, y - height / 2, "enemy 1")
         .setBody({ shape: "rectangle", density: 0.001});
-    });
+    */});
 //TODO: give coins an actual sprite
     this.map.getObjectLayer("coins").objects.forEach(createObject => {
       const { x, y, width, height } = createObject;
@@ -390,11 +401,12 @@ var Level3 = new Phaser.Class({
   },
   // Update function runs for every frame.
   update: function() {
-    if (this.player.sprite.y > this.map.heightInPixels-16) {
+    if ((this.player.sprite.y > this.map.heightInPixels-16) || (this.player.dead)) {
       this.player.freeze();
       const cam = this.cameras.main;
-      cam.fade(250, 0, 0, 0);
-      cam.once("camerafadeoutcomplete", () => this.scene.restart());
+      //cam.fade(250, 0, 0, 0);
+      //cam.once("camerafadeoutcomplete", () => this.scene.restart());
+      this.scene.restart();
     }
     //Test if the player is beyond the level_end object
     if (this.player.sprite.x > this.level_end.x) {
@@ -442,6 +454,7 @@ var Level4 = new Phaser.Class({
   // Create function runs once after preload has run
   create: function ()
   {
+    this.cameras.main.fadeIn(600);
     // Initialize a map from the tilemap and load a tileset for it
     this.map = this.make.tilemap({ key: "level 4 map" });
     const robot_tileset = this.map.addTilesetImage("RobotTileset.v1");
@@ -485,14 +498,15 @@ var Level4 = new Phaser.Class({
     this.cameras.main.startFollow(this.player.sprite, false, 0.5, 0.5);
 
     // Load up some objects. These will later be enemies or other level hazards.
-    this.map.getObjectLayer("enemies").objects.forEach(crateObject => {
-      const { x, y, width, height } = crateObject;
+    this.map.getObjectLayer("enemies").objects.forEach(createObject => {
+      const { x, y } = createObject;
+      new Enemy_1(this, x, y, this.map.heightInPixels-16);
 
       // Tiled origin for coordinate system is (0, 1), but we want (0.5, 0.5)
-      this.matter.add
+      /*this.matter.add
         .image(x + width / 2, y - height / 2, "enemy 1")
         .setBody({ shape: "rectangle", density: 0.001});
-    });
+    */});
 //TODO: give coins an actual sprite
     this.map.getObjectLayer("coins").objects.forEach(createObject => {
       const { x, y, width, height } = createObject;
@@ -514,12 +528,13 @@ var Level4 = new Phaser.Class({
   },
   // Update function runs for every frame.
   update: function() {
-    /*if (this.player.sprite.y > this.map.heightInPixels-16) {
+    if ((this.player.sprite.y > this.map.heightInPixels-16) || (this.player.dead)) {
       this.player.freeze();
       const cam = this.cameras.main;
-      cam.fade(250, 0, 0, 0);
-      cam.once("camerafadeoutcomplete", () => this.scene.restart());
-    }*/
+      //cam.fade(250, 0, 0, 0);
+      //cam.once("camerafadeoutcomplete", () => this.scene.restart());
+      this.scene.restart();
+    }
     //Test if the player is beyond the level_end object
     if (this.player.sprite.x > this.level_end.x) {
       this.scene.stop('Level4');
@@ -569,6 +584,7 @@ var Level5 = new Phaser.Class({
   // Create function runs once after preload has run
   create: function ()
   {
+    this.cameras.main.fadeIn(600);
     // Initialize a map from the tilemap and load a tileset for it
     this.map = this.make.tilemap({ key: "level 5 map" });
     const robot_tileset = this.map.addTilesetImage("RobotTileset.v1");
@@ -612,14 +628,15 @@ var Level5 = new Phaser.Class({
     this.cameras.main.startFollow(this.player.sprite, false, 0.5, 0.5);
 
     // Load up some objects. These will later be enemies or other level hazards.
-    this.map.getObjectLayer("enemies").objects.forEach(crateObject => {
-      const { x, y, width, height } = crateObject;
+    this.map.getObjectLayer("enemies").objects.forEach(createObject => {
+      const { x, y } = createObject;
+      new Enemy_1(this, x, y, this.map.heightInPixels-16);
 
       // Tiled origin for coordinate system is (0, 1), but we want (0.5, 0.5)
-      this.matter.add
+      /*this.matter.add
         .image(x + width / 2, y - height / 2, "enemy 1")
         .setBody({ shape: "rectangle", density: 0.001});
-    });
+    */});
 //TODO: give coins an actual sprite
     this.map.getObjectLayer("coins").objects.forEach(createObject => {
       const { x, y, width, height } = createObject;
@@ -641,11 +658,12 @@ var Level5 = new Phaser.Class({
   },
   // Update function runs for every frame.
   update: function() {
-    if (this.player.sprite.y > this.map.heightInPixels-16) {
+    if ((this.player.sprite.y > this.map.heightInPixels-16) || (this.player.dead)) {
       this.player.freeze();
       const cam = this.cameras.main;
-      cam.fade(250, 0, 0, 0);
-      cam.once("camerafadeoutcomplete", () => this.scene.restart());
+      //cam.fade(250, 0, 0, 0);
+      //cam.once("camerafadeoutcomplete", () => this.scene.restart());
+      this.scene.restart();
     }
     //Test if the player is beyond the level_end object
     if (this.player.sprite.x > this.level_end.x) {
